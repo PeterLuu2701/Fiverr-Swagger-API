@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model comment {
+  id           Int       @id @default(autoincrement())
+  job_id       Int?
+  user_id      Int?
+  comment_date DateTime? @db.DateTime(0)
+  content      String?   @db.VarChar(255)
+  comment_star Int?
+  job          job?      @relation(fields: [job_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "comment_ibfk_1")
+  user         user?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "comment_ibfk_2")
+
+  @@index([job_id], map: "job_id")
+  @@index([user_id], map: "user_id")
+}
+
+model hire {
+  id        Int       @id @default(autoincrement())
+  job_id    Int?
+  user_id   Int?
+  hire_date DateTime? @db.DateTime(0)
+  complate  Boolean?
+  job       job?      @relation(fields: [job_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "hire_ibfk_1")
+  user      user?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "hire_ibfk_2")
+
+  @@index([job_id], map: "job_id")
+  @@index([user_id], map: "user_id")
+}
+
+model job {
+  id                 Int            @id @default(autoincrement())
+  job_name           String?        @db.VarChar(255)
+  rate               Int?
+  salary             Int?
+  image              String?        @db.VarChar(255)
+  job_title          String?        @db.VarChar(255)
+  job_sub_title      String?        @db.VarChar(255)
+  job_star           Int?
+  job_type_detail_id Int?
+  user_id            Int?
+  comment            comment[]
+  hire               hire[]
+  jobTypeDetail      jobTypeDetail? @relation(fields: [job_type_detail_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "job_ibfk_1")
+  user               user?          @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "job_ibfk_2")
+
+  @@index([job_type_detail_id], map: "job_type_detail_id")
+  @@index([user_id], map: "user_id")
+}
+
+model jobType {
+  id            Int             @id @default(autoincrement())
+  job_type_name String?         @db.VarChar(50)
+  jobTypeDetail jobTypeDetail[]
+}
+
+model jobTypeDetail {
+  id                   Int      @id @default(autoincrement())
+  job_type_detail_name String?  @db.VarChar(255)
+  image                String?  @db.VarChar(255)
+  job_type_id          Int?
+  job                  job[]
+  jobType              jobType? @relation(fields: [job_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "jobTypeDetail_ibfk_1")
+
+  @@index([job_type_id], map: "job_type_id")
+}
+
+model user {
+  id            Int       @id @default(autoincrement())
+  name          String?   @db.VarChar(50)
+  email         String?   @db.VarChar(50)
+  password      String?   @db.VarChar(50)
+  phone         String?   @db.VarChar(50)
+  birthday      String?   @db.VarChar(50)
+  gender        String?   @db.VarChar(50)
+  role          String?   @db.VarChar(50)
+  skill         String?   @db.VarChar(255)
+  certification String?   @db.VarChar(255)
+  comment       comment[]
+  hire          hire[]
+  job           job[]
+}
