@@ -66,6 +66,7 @@ model jobTypeDetail {
   image                String?  @db.VarChar(255)
   job_type_id          Int?
   job                  job[]
+  job_type_detail_list jobTypeDetailList[]
   jobType              jobType? @relation(fields: [job_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "jobTypeDetail_ibfk_1")
 
   @@index([job_type_id], map: "job_type_id")
@@ -85,4 +86,13 @@ model user {
   comment       comment[]
   hire          hire[]
   job           job[]
+}
+
+model jobTypeDetailList {
+  id                 Int     @id
+  job_type_detail_id Int?
+  detail_name        String? @db.VarChar(255)
+  detail_list        Int
+  job_type_detail   jobTypeDetail?  @relation(fields: [job_type_id], references: [id])
+  job_type_id       Int?
 }

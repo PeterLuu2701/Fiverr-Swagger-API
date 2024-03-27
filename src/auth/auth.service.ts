@@ -4,17 +4,18 @@ import { UpdateAuthDto } from './dto/update-auth.dto';
 import { PrismaClient, user } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 
+const prisma = new PrismaClient();
+
 @Injectable()
 export class AuthService {
 
   constructor(
-    private prisma: PrismaClient,
     private jwtService: JwtService,
   ) { }
 
   async create(createAuthDto: CreateAuthDto) {
     try {
-      const createUser = await this.prisma.user.create({
+      const createUser = await prisma.user.create({
         data: {
           name: createAuthDto.name,
           email: createAuthDto.email,
@@ -34,7 +35,7 @@ export class AuthService {
   async login(loginDto: LoginDto): Promise<string> {
     const { email, password } = loginDto;
 
-    const user: user | null = await this.prisma.user.findFirst({
+    const user: user | null = await prisma.user.findFirst({
       where: { email },
     });
 
@@ -42,7 +43,7 @@ export class AuthService {
       throw new Error('Invalid credentials');
     }
 
-    const token = this.jwtService.sign({ userId: user.id }, { expiresIn: "5m", secret: "SECRET_KEY" });
+    const token = this.jwtService.sign({ userId: user.id, userName: user.name, userPhone: user.phone, userBirthday: user.birthday }, { expiresIn: "5m", secret: "SECRET_KEY" });
 
     return token;
   }
