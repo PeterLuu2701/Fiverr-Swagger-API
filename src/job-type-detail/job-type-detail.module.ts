@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
-import { JobTypeDetailService } from './job-type-detail.service';
+import { JobTypeDetailListService, JobTypeDetailService } from './job-type-detail.service';
 import { JobTypeDetailController } from './job-type-detail.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtStrategy } from 'src/strategy/jwt.strategy';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigModule, AuthModule],
   controllers: [JobTypeDetailController],
-  providers: [JobTypeDetailService, ConfigService],
+  providers: [JobTypeDetailService, JobTypeDetailListService, ConfigService, JwtStrategy],
 })
 export class JobTypeDetailModule {}

@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { JobTypeService } from './job-type.service';
 import { CreateJobTypeDto } from './dto/create-job-type.dto';
 import { UpdateJobTypeDto } from './dto/update-job-type.dto';
-import { ApiBody, ApiProperty, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiProperty, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 
 class jobTypeType {
   @ApiProperty()
@@ -15,7 +16,8 @@ class jobTypeType {
 export class JobTypeController {
   constructor(private readonly jobTypeService: JobTypeService) {}
 
-  // @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @ApiBody({type: jobTypeType})
   @Post('create-job-type')
   create(@Body() jobType: jobTypeType) {
@@ -23,7 +25,8 @@ export class JobTypeController {
   }
 
   @Get()
-  findAll() {
+  findAll(@Req() req: Request) {
+    req.user
     return this.jobTypeService.findAll();
   }
 
@@ -32,12 +35,16 @@ export class JobTypeController {
     return this.jobTypeService.findOne(+id);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @ApiBody({ type: jobTypeType })
   @Patch('update-job-type-by-id/:id')
   update(@Param('id') id: string, @Body() updateJobTypeDto: UpdateJobTypeDto) {
     return this.jobTypeService.update(+id, updateJobTypeDto);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.jobTypeService.remove(+id);

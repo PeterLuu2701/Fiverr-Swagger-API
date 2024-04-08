@@ -26,7 +26,7 @@ model hire {
   job_id    Int?
   user_id   Int?
   hire_date DateTime? @db.DateTime(0)
-  complate  Boolean?
+  complete  Boolean?
   job       job?      @relation(fields: [job_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "hire_ibfk_1")
   user      user?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "hire_ibfk_2")
 
@@ -40,7 +40,7 @@ model job {
   rate               Int?
   salary             Int?
   image              String?        @db.VarChar(255)
-  job_title          String?        @db.VarChar(255)
+  job_title          String?        @db.VarChar(500)
   job_sub_title      String?        @db.VarChar(255)
   job_star           Int?
   job_type_detail_id Int?
@@ -66,7 +66,6 @@ model jobTypeDetail {
   image                String?  @db.VarChar(255)
   job_type_id          Int?
   job                  job[]
-  job_type_detail_list jobTypeDetailList[]
   jobType              jobType? @relation(fields: [job_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "jobTypeDetail_ibfk_1")
 
   @@index([job_type_id], map: "job_type_id")
@@ -78,7 +77,7 @@ model user {
   email         String?   @db.VarChar(50)
   password      String?   @db.VarChar(50)
   phone         String?   @db.VarChar(50)
-  birthday      String?   @db.VarChar(50)
+  birthday      DateTime? @db.DateTime(0)
   gender        String?   @db.VarChar(50)
   role          String?   @db.VarChar(50)
   skill         String?   @db.VarChar(255)
@@ -89,10 +88,7 @@ model user {
 }
 
 model jobTypeDetailList {
-  id                 Int     @id
+  id                 Int     @id @default(autoincrement())
   job_type_detail_id Int?
   detail_name        String? @db.VarChar(255)
-  detail_list        Int
-  job_type_detail   jobTypeDetail?  @relation(fields: [job_type_id], references: [id])
-  job_type_id       Int?
 }

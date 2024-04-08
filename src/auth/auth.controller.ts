@@ -35,14 +35,14 @@ class userLoginType {
   password: string
 }
 
-@ApiTags('Auth')
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @ApiBody({ type: userType })
   @Post('sign-up')
-  create(@Body() user: userType) { 
+  signUp(@Body() user: userType) { 
     return this.authService.create(user);
   }
 
