@@ -6,6 +6,7 @@ import { JobTypeDetail } from './entities/job-type-detail.entity';
 import { JobTypeDetailList } from './entities/job-type-detail-list.entity';
 import { CreateJobTypeDetailListDto } from './dto/create-job-type-detail-list.dto';
 import { UpdateJobTypeDetailListDto } from './dto/update-job-type-detail-list.dto';
+import * as jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient
 
@@ -23,7 +24,7 @@ export class JobTypeDetailService {
       });
       return createJobTypeDetail;
     } catch (error) {
-      throw new Error('Failed to create job type detail');
+      throw new Error(error);
     }
   }
 
@@ -37,7 +38,7 @@ export class JobTypeDetailService {
       });
       return createJobTypeDetailList;
     } catch (error) {
-      throw new Error('Failed to create job type detail');
+      throw new Error(error);
     }
   }
 
@@ -59,7 +60,7 @@ export class JobTypeDetailService {
 
       return jobTypeDetailsWithLists;
     } catch (error) {
-      throw new Error('Failed to retrieve job types');
+      throw new Error(error);
     }
   }
 
@@ -85,7 +86,7 @@ export class JobTypeDetailService {
 
       return jobTypeDetailWithList;
     } catch (error) {
-      throw new Error('Failed to retrieve job types');
+      throw new Error(error);
     }
   }
 
@@ -134,7 +135,7 @@ export class JobTypeDetailService {
       });
       return updatedJobTypeDetail;
     } catch (error) {
-      throw new Error('Failed to update job type');
+      throw new Error(error);
     }
   }
 
@@ -147,10 +148,31 @@ export class JobTypeDetailService {
       });
       return deleteJobTypeDetail;
     } catch (error) {
-      throw new Error('Failed to delete job type');
+      throw new Error(error);
+    }
+  }
+
+  async uploadPictureById(id: number, file: Express.Multer.File): Promise<any> {
+    try {
+      const encodedPicture = jwt.sign({ picture: file.buffer.toString('base64') }, 'SECRET_KEY', { algorithm: 'HS256' });
+      
+      const updatedJobTypeDetail = await prisma.jobTypeDetail.update({
+        where: {
+          id: id
+        },
+        data: {
+          image: encodedPicture
+        }
+      });
+
+      return updatedJobTypeDetail;
+    } catch (error) {
+      throw new Error(error);
     }
   }
 }
+
+
 
 @Injectable()
 export class JobTypeDetailListService {
@@ -168,5 +190,5 @@ export class JobTypeDetailListService {
     }
   }
 
-  // Other methods for JobTypeDetailListService
+
 }

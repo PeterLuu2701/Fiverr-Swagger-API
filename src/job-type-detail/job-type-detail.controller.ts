@@ -1,12 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { JobTypeDetailListService, JobTypeDetailService } from './job-type-detail.service';
 import { CreateJobTypeDetailDto } from './dto/create-job-type-detail.dto';
 import { CreateJobTypeDetailListDto } from './dto/create-job-type-detail-list.dto';
 import { UpdateJobTypeDetailDto } from './dto/update-job-type-detail.dto';
-import { ApiBearerAuth, ApiBody, ApiProperty, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiProperty, ApiTags } from '@nestjs/swagger';
 import { JobTypeDetailList } from './entities/job-type-detail-list.entity';
 import { UpdateJobTypeDetailListDto } from './dto/update-job-type-detail-list.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { FileUploadDto } from './entities/job-type-detail.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+
+const upload = {
+  storage: diskStorage({
+    destination: process.cwd() + "/public/img",
+    filename: (req, file, callback) => callback(null, new Date().getTime() + "_" + file.originalname)
+  })
+}
 
 // class jobTypeDetailType {
 //   @ApiProperty()
@@ -75,5 +85,14 @@ export class JobTypeDetailController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.jobTypeDetailService.remove(+id);
+  }
+
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: FileUploadDto })
+  // yarn add @types/multer
+  @UseInterceptors(FileInterceptor("upload", upload))
+  @Patch('/upload-job-type-detail-picture-by-id/:id')
+  uploadPictureById(@UploadedFile() file: Express.Multer.File, @Param('id') id: string) {
+    return file
   }
 }
