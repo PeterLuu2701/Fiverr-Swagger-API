@@ -90,7 +90,7 @@ export class JobTypeDetailController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: FileUploadDto })
   // yarn add @types/multer
-  @UseInterceptors(FileInterceptor("upload", upload))
+  @UseInterceptors(FileInterceptor("file", upload))
   @Patch('/upload-job-type-detail-picture-by-id/:id')
   uploadPictureById(@UploadedFile() file: Express.Multer.File, @Param('id') id: string) {
     return file

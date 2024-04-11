@@ -7,6 +7,7 @@ import { JobTypeDetailList } from './entities/job-type-detail-list.entity';
 import { CreateJobTypeDetailListDto } from './dto/create-job-type-detail-list.dto';
 import { UpdateJobTypeDetailListDto } from './dto/update-job-type-detail-list.dto';
 import * as jwt from 'jsonwebtoken';
+import { createHash } from 'crypto';
 
 const prisma = new PrismaClient
 
@@ -152,21 +153,24 @@ export class JobTypeDetailService {
     }
   }
 
-  async uploadPictureById(id: number, file: Express.Multer.File): Promise<any> {
+  async uploadPictureById(id: number, file: Express.Multer.File, updateJobTypeDetailDto: UpdateJobTypeDetailDto): Promise<any> {
     try {
-      const encodedPicture = jwt.sign({ picture: file.buffer.toString('base64') }, 'SECRET_KEY', { algorithm: 'HS256' });
-      
+
+      const encodedPicture = file.buffer.toString('base64');
+
+      // You may consider hashing the image for additional security
+      const hash = createHash('sha256');
+      hash.update(encodedPicture);
+      const hashedEncodedPicture = hash.digest('hex');
+
       const updatedJobTypeDetail = await prisma.jobTypeDetail.update({
-        where: {
-          id: id
-        },
-        data: {
-          image: encodedPicture
-        }
+        where: { id: id },
+        data: { image: hashedEncodedPicture } // Corrected line
       });
 
       return updatedJobTypeDetail;
     } catch (error) {
+      console.error('Error uploading picture:', error); // Log any errors
       throw new Error(error);
     }
   }

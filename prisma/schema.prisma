@@ -63,7 +63,7 @@ model jobType {
 model jobTypeDetail {
   id                   Int      @id @default(autoincrement())
   job_type_detail_name String?  @db.VarChar(255)
-  image                String?  @db.VarChar(255)
+  image                String?  @db.VarChar(500)
   job_type_id          Int?
   job                  job[]
   jobType              jobType? @relation(fields: [job_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "jobTypeDetail_ibfk_1")
